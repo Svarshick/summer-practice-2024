@@ -4,65 +4,67 @@
 #include <vector>
 #include <cassert>
 
-using str_it = std::string::const_iterator;
+using str_it = std::wstring::const_iterator;
 
-void printAllMatches(str_it beg, str_it end, const std::regex& rex){
-    std::smatch sm;
+void printAllMatches(str_it beg, str_it end, const std::wregex& rex){
+    std::wsmatch sm;
     for (;std::regex_search(beg, end, sm, rex); beg += (sm.position() + sm.length()))
-        std::cout << sm.str() << '\n';
+        std::wcout << sm.str() << '\n';
 }
 
-void simple_paragraph(const std::string& data, const std::regex& rex, int p) {
-    std::cout << "------p" << p << " is beginnig------\n";
+void simple_paragraph(const std::wstring& data, const std::wregex& rex, int p) {
+    std::wcout << "------p" << p << " is beginnig------\n";
     printAllMatches(data.cbegin(), data.cend(), rex);
-    std::cout << "p" << p << " is completed\n";
+    std::wcout << "p" << p << " is completed\n";
 }
 
-void p11(const std::string& data){
-    std::regex rex("\\d");
+void p11(const std::wstring& data){
+    std::wregex rex(L"\\d");
 
     assert(("there is no numerics", std::regex_search(data, rex)));
 
     auto beg = data.cbegin();
     auto end = data.cend();
-    std::smatch sm;
+    std::wsmatch sm;
     double sum = 0;
     for (;std::regex_search(beg, end, sm, rex); beg += (sm.position() + sm.length()))
         sum += stoi(sm.str());
     
-    std::cout << "------result of p11: " << sum << "------\n";
+    std::wcout << "------result of p11: " << sum << "------\n";
 }
 
-void p12(const std::string& data){
-    std::regex rex("<([^<>]+)>");
+void p12(const std::wstring& data){
+    std::wregex rex(L"<([^<>]+)>");
     
     assert(("there is no <lps> type string", std::regex_search(data, rex)));
 
     auto beg = data.cbegin();
     auto end = data.cend();
-    std::smatch sm; 
-    std::string result;
+    std::wsmatch sm; 
+    std::wstring result;
     for (; std::regex_search(beg, end, sm, rex); beg += (sm.position() + sm.length()))
         result += sm[1].str();
     
-    std::cout << "------result of p12: " << result << "------\n";
+    std::wcout << "------result of p12: " << result << "------\n";
 }
 
 int main(){
-    std::string data;
-    data = "abca a1a a2a a6,7sdc8.9ksdja 2+++3 ab<sdf<here>bbbb>>a <>abba<and here>  >>";
-    std::vector<std::regex> rex_storage {
-        std::regex("a..a"),
-        std::regex("a([^b].|b[^c])a"), 
-        std::regex("a(b)*a"), 
-        std::regex("(ab)+"), 
-        std::regex("2(\\+)*3"),
-        std::regex("a(b){2,4}a"),
-        std::regex("a(b){4,}"),
-        std::regex("a[0-9]a"),
-        std::regex("a\\Da"),
-        std::regex("a[a-z]+a"),
+    setlocale(LC_ALL, "");
+    std::wstring data;
+    data = L"aбfццбfa";
+    std::vector<std::wregex> rex_storage {
+        std::wregex(L"a..a"),
+        std::wregex(L"a([^b].|b[^c])a"), 
+        std::wregex(L"a(b)*a"), 
+        std::wregex(L"(ab)+"), 
+        std::wregex(L"2(\\+)*3"),
+        std::wregex(L"a(b){2,4}a"),
+        std::wregex(L"a(b){4,}"),
+        std::wregex(L"a[0-9]a"),
+        std::wregex(L"a\\Da"),
+        std::wregex(L"a[a-zа-я]+?a"),
     };
+    std::wcout << "data: " << data << '\n';
     for (int i = 0; i < rex_storage.size(); ++i)
         simple_paragraph(data, rex_storage[i], i + 1);
     
